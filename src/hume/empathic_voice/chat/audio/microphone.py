@@ -88,7 +88,10 @@ class Microphone:
         def callback(indata: cffi_backend.buffer, _frames: int, _time: CDataBase, _status: CallbackFlags) -> None:
             event_loop.call_soon_threadsafe(microphone.stream.queue.put_nowait, indata[:])
 
-        with RawInputStream(callback=callback, dtype=cls.DATA_TYPE, device=device):
+        with RawInputStream(
+            callback=callback, dtype=cls.DATA_TYPE, device=device,
+            samplerate=sample_rate, channels=num_channels,
+        ):
             yield microphone
 
     def __aiter__(self) -> AsyncIterator[bytes]:
